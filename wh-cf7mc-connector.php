@@ -16,7 +16,7 @@
  * Plugin Name:       WH CF7 Mailchimp connector
  * Plugin URI:        http://www.webheroes.it
  * Description:       This plugin connect Contact Form 7 with Mailchimp using MCAPI v1.3. Superpowered by <strong>Web Heroes.</strong>
- * Version:           1.0.0
+ * Version:           1.0.1a
  * Author:            Web Heroes
  * Author URI:        http://www.webheroes.it
  * License:           GPL-2.0+
@@ -73,3 +73,27 @@ function run_wh_cf7mc_connector() {
 
 }
 run_wh_cf7mc_connector();
+
+function wh_cf7mc_connector_github_updater_init() {
+	include_once plugin_dir_path( __FILE__ ) .'includes/updater.php';
+	define( 'WP_GITHUB_FORCE_UPDATE', true );
+
+	if ( is_admin() ) { // note the use of is_admin() to double check that this is happening in the admin
+		$config = array(
+			'slug' => plugin_basename( __FILE__ ),
+			'proper_folder_name' => 'wh-hfcode',
+			'api_url' => 'https://api.github.com/repos/mitch827/wh-hfcode',
+			'raw_url' => 'https://raw.github.com/mitch827/wh-hfcode/master',
+			'github_url' => 'https://github.com/mitch827/wh-hfcode',
+			'zip_url' => 'https://github.com/mitch827/wh-hfcode/archive/master.zip',
+			'sslverify' => true,
+			'requires' => '4.0.0',
+			'tested' => '4.2.3',
+			'readme' => 'README.md',
+			'access_token' => '',
+		);
+		new WP_GitHub_Updater( $config );
+	}
+
+}
+add_action( 'init', 'wh_cf7mc_connector_github_updater_init' );

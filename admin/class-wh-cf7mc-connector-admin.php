@@ -62,7 +62,7 @@ class Wh_Cf7mc_Connector_Admin {
 		$this->version = $version;
 
 	}
-
+	
 	/**
 	 * Register the stylesheets for the admin area.
 	 *

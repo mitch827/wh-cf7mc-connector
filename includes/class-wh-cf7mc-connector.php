@@ -123,12 +123,7 @@ class Wh_Cf7mc_Connector {
 		 * The class responsible for communicating eith MCAPI v.1.3
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/MCAPI.class.php';
-		
-		/**
-		 * The class responsible for updating the plugin through GitHub
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/updater.php';
-		
+				
 		$this->loader = new Wh_Cf7mc_Connector_Loader();
 
 	}
@@ -164,7 +159,7 @@ class Wh_Cf7mc_Connector {
 
 		//$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		//$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'init', $plugin_admin, 'github_plugin_updater_test_init' );
+
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_options_page' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_setting' );
 		
