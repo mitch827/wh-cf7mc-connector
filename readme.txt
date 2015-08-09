@@ -4,7 +4,7 @@ Donate link: http://www.webheroes.it
 Tags: comments, spam
 Requires at least: 3.0.1
 Tested up to: 4.2.4
-Stable tag: 1.0.5a
+Stable tag: 1.0.6a
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -28,6 +28,11 @@ This section describes how to install the plugin and get it working.
 = This is an **Alpha verions** =
 
 == Changelog ==
+
+= 1.0.6a =
+* Plugin generalization
+* Added: possibility to chose different contact forms
+* Added: tabbed options
 
 = 1.0.5a =
 * Final plugin updater (via github updater centralized plugin)
