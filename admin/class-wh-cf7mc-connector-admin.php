@@ -157,7 +157,7 @@ class Wh_Cf7mc_Connector_Admin {
 		
 		add_settings_section(
 		    $this->option_name . '_form_data',
-		    __( 'Form Data', 'wh-cf7mc-connector' ),
+		    __( 'CF7 settings', 'wh-cf7mc-connector' ),
 		    array( $this, $this->option_name . '_form_data_cb' ),
 		    $this->plugin_name . '_form_data'
 		);
@@ -181,6 +181,24 @@ class Wh_Cf7mc_Connector_Admin {
 		);
 		
 		add_settings_field(
+		    $this->option_name . '_nl',
+		    __( 'Newsletter subscription form', 'wh-cf7mc-connector' ),
+		    array( $this, $this->option_name . '_nl_cb' ),
+		    $this->plugin_name . '_form_data',
+		    $this->option_name . '_form_data',
+		    array( 'label_for' => $this->option_name . '_nl' )
+		);
+		
+		add_settings_field(
+		    $this->option_name . '_cf',
+		    __( 'Complete contact form', 'wh-cf7mc-connector' ),
+		    array( $this, $this->option_name . '_cf_cb' ),
+		    $this->plugin_name . '_form_data',
+		    $this->option_name . '_form_data',
+		    array( 'label_for' => $this->option_name . '_cf' )
+		);
+		
+		add_settings_field(
 		    'honeypot',
 		    __( 'Honeypot', 'wh-cf7mc-connector' ),
 		    array( $this, $this->option_name . '_honeypot_cb' ),
@@ -200,6 +218,8 @@ class Wh_Cf7mc_Connector_Admin {
 
 		register_setting( $this->plugin_name . '_mailchimp_account', 'api_key','strval' );
 		register_setting( $this->plugin_name . '_mailchimp_account', 'list_id', array( $this, $this->option_name . '_sanitize_code' )  );
+		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_nl', array( $this, $this->option_name . '_sanitize_code' )  );
+		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_cf', array( $this, $this->option_name . '_sanitize_code' )  );
 		register_setting( $this->plugin_name . '_extra', 'honeypot', array( $this, $this->option_name . '_sanitize_code' )  );
 		register_setting( $this->plugin_name . '_extra', 'debug', array( $this, $this->option_name . '_sanitize_code' )  );
 
@@ -216,7 +236,43 @@ class Wh_Cf7mc_Connector_Admin {
 	}
 	
 	public function wh_Cf7mc_Connector_form_data_cb() {
-	    echo '<p>' . __( 'Optins and groupings values', 'wh-cf7mc-connector' ) . '</p>';
+	    ?>
+	    <div id ="welcome-panel" class="welcome-panel">
+		    <div class="welcome-panel-content">
+			    
+			    <div class="welcome-panel-column" style="width: 50%;">
+				    <h4><?php _e("How to use", "wh-cf7mc-connector"); ?></h4>
+				    <p class="message">
+					    <?php _e( 'Remember to use this labels on Mailchimp, groupings: <ul><li>Group name: <strong>"Dal sito"</strong></li><li>Grouping: <strong>Nome form</strong></li></ul>', 'wh-cf7mc-connector' ); ?>
+				    </p>
+				</div>
+			    
+			    <div class="welcome-panel-column" style="width: 50%;">
+				    <p class="message">Use these contact forms:</p>
+				    <p class="message"><strong>Form name: "Inscrizione Newsletter"</strong><br/>
+					    <code>
+						    [text honeypot class:honeypot]<br/>
+						    [email* email-nl placeholder akismet:author_email "Indirizzo email.."]<br/>
+						    [submit class:button class:tiny "Iscriviti"]
+						</code>
+					</p>
+				    
+				    <p class="message"><strong>Form name: "Inscrizione Newsletter"</strong><br/>
+					    <code>
+					    	[email* email-cf placeholder akismet:author_email "paolo@rossi.com"]<br/>
+						    [textarea* textarea-cf placeholder "messaggio..."]<br/>
+						    [checkbox* checkbox-privacy "Ho letto e accettato"] &lt;a href='privacy-e-note-legali' title='Informativa sulla privacy' target='_blank'&gt;l'informativa sulla Privacy&lt;/a&gt;<br/>
+						    [checkbox mailchimp-optin default:1 "Desidero iscrivermi alla newsletter"]<br/>
+							[text honeypot class:honeypot]<br/>
+							[submit class:button class:right "Invia"]
+						</code>
+					</p>
+			    </div>
+			    
+		    </div>
+	    </div>
+	    
+	    <?php
 	}
 	
 	public function wh_Cf7mc_Connector_extra_cb() {
@@ -231,8 +287,8 @@ class Wh_Cf7mc_Connector_Admin {
 	public function wh_Cf7mc_Connector_api_key_cb() {
 		$api_key = get_option( 'api_key' );
 		?>
-			<input style="width: 100%;" type="text" name="api_key" id="api_key" value="<?php echo $api_key; ?>" />
-			<p><em>Generate an API Key inside your Mailchimp account settings page.</em></p>	
+			<input style="width: 50%;" type="text" name="api_key" id="api_key" value="<?php echo $api_key; ?>" />
+			<p class="description">Generate an API Key inside your Mailchimp account settings page.</p>
 			
 		<?php
 	}
@@ -275,23 +331,49 @@ class Wh_Cf7mc_Connector_Admin {
 				<option value="no list"><?php _e( 'no lists', 'wh-mailchimp-cf7-connector' ); ?></option>
 			<?php endif; ?>
 			</select>
-			<p><em>First save your API KEY! Then check if your lists show up.</em></p>
+			<p class="description">First <strong>save your API KEY!</strong> Then check if your lists show up.</p>
 			
+		<?php
+	}
+	
+	public function wh_Cf7mc_Connector_nl_cb() {
+		$nl = get_option( $this->option_name . '_nl' );
+		?>
+			<label>
+			<input type="checkbox" name="<?php echo $this->option_name . '_nl'; ?>" value="1" <?php checked( $nl , 1 ); ?> > Using newsletter subscription form
+			</label>
+			<p class="description">Email field: <strong>"email-nl"</strong>.</p>
+		<?php
+	}
+	
+	public function wh_Cf7mc_Connector_cf_cb() {
+		$cf = get_option( $this->option_name . '_cf' );
+		?>
+			<label>
+			<input type="checkbox" name="<?php echo $this->option_name . '_cf'; ?>" value="1" <?php checked( $cf , 1 ); ?> > Using complete contact form
+			</label>
+			<p class="description">Email field: <strong>"email-cf"</strong>. Newsletter subscription: <strong>"mailchimp-optin"</strong>.</p>
 		<?php
 	}
 	
 	public function wh_Cf7mc_Connector_honeypot_cb() {
 		$honeypot = get_option( 'honeypot' );
-		?>
-			<input type="checkbox" name="honeypot" value="1" <?php checked( $honeypot , 1 ); ?> > <em>Will be generated an hidden field for spam prevention. <br><b>Put this shortcode in your forms:</b></em> <pre style ="display: inline-block;">[text honeypot class:honeypot]</pre>	
+		?>	
+			<label>
+			<input type="checkbox" name="honeypot" value="1" <?php checked( $honeypot , 1 ); ?> > Use honeypot
+			</label>
+			<p class="description">Insert an hidden field for spam prevention. <b>Put this shortcode in your forms:</b> <code>[text honeypot class:honeypot]</code></p>
 			
 		<?php
 	}
 	
 	public function wh_Cf7mc_Connector_debug_cb() {
 		$debug = get_option( 'debug' );
-		?>
-			<input type="checkbox" name="debug" value="1" <?php checked( $debug , 1 ); ?> > <em>Will be generated a file called devlog.txt in the site root folder for debug purpose.</em>
+		?>	
+			<label>
+			<input type="checkbox" name="debug" value="1" <?php checked( $debug , 1 ); ?> > Debug activated
+			</label> 
+			<p class="description">Generate a file called <code>devlog.txt</code> in the site root folder for debug purpose.</p>
 			
 		<?php
 	}

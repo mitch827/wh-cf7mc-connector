@@ -127,34 +127,22 @@ class Wh_Cf7mc_Connector_Public {
 		 * @return $retMCdata
 		 */
 		function data_for_mailchimp( $formtitle, $posted_data){
-			$newsletter = (bool) get_option( $this->option_name . '_nl' );
-			$contactform = (bool) get_option( $this->option_name . '_cf' );
 			
-			if (!$newsletter && !$contactform){
-				return;
-			}
-			if ($newsletter){
+			if (  $formtitle == 'Iscrizione newsletter' ) {
+				 
+				$mergeVars = null;
 	
+	/*
 				$mergeVars = array(
-					'GROUPINGS'=>array( 
-						array('name'=>'Dal sito', 'groups'=>$formtitle)
-					)
-				);		
-				$send_this_email = $posted_data['email-nl'];
-			}
-			if ($contactform){
-				//Mailchimp optin
-				if( $posted_data['mailchimp-optin'] ){
-					
-					$mergeVars = array(			
-						'GROUPINGS'=>array( 
-			 				array('name'=>'Dal sito', 'groups'=>$formtitle)
-			 			)
-		 			);
-		 			$send_this_email = $posted_data['email-cf'];
-				}			
-			}
-			
+		 			'GROUPINGS'=>array( 
+		 				array('name'=>'Dal sito', 'groups'=>$formtitle)
+		 			)
+				);
+	*/
+					$send_this_email = $posted_data['email-nl'];
+				
+					//Mailchimp optin
+			} 
 			$retMCdata = array(
 				'send_this_email' => $send_this_email,
 				'mergeData' => $mergeVars
