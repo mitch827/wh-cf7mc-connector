@@ -118,6 +118,8 @@ class Wh_Cf7mc_Connector_Public {
 	 */
 	public function wh_mailchimp_cf7_connect($cfdata) {
 		
+		$newsletter = (bool) get_option( $this->option_name . '_nl' );
+		
 		/**
 		 * data_for_mailchimp function.
 		 * 
@@ -126,23 +128,21 @@ class Wh_Cf7mc_Connector_Public {
 		 * @param mixed $posted_data
 		 * @return $retMCdata
 		 */
-		function data_for_mailchimp( $formtitle, $posted_data){
+		function data_for_mailchimp( $formtitle, $posted_data, $newsletter ){
 			
-			if (  $formtitle == 'Iscrizione newsletter' ) {
-				 
-				$mergeVars = null;
-	
-	/*
-				$mergeVars = array(
-		 			'GROUPINGS'=>array( 
-		 				array('name'=>'Dal sito', 'groups'=>$formtitle)
-		 			)
-				);
-	*/
-					$send_this_email = $posted_data['email-nl'];
 				
-					//Mailchimp optin
-			} 
+				if ( $newsletter == 1 ) {
+				 
+					$mergeVars = array(
+			 			'GROUPINGS'=>array( 
+			 				array('name'=>'Dal sito', 'groups'=>$formtitle)
+			 			)
+					);
+						$send_this_email = $posted_data['email-nl'];
+					
+						//Mailchimp optin
+				} 
+			
 			$retMCdata = array(
 				'send_this_email' => $send_this_email,
 				'mergeData' => $mergeVars
@@ -170,13 +170,13 @@ class Wh_Cf7mc_Connector_Public {
 	
 		if ( $honeypot_opt == 1){
 			if (strlen($honeypot) == 0){
-			  	$data = data_for_mailchimp( $formtitle, $posted_data);
+			  	$data = data_for_mailchimp( $formtitle, $posted_data, $newsletter);
 			} else {
 				
 				return false;
 			}
 		} else {
-			$data = data_for_mailchimp( $formtitle, $posted_data);
+			$data = data_for_mailchimp( $formtitle, $posted_data, $newsletter);
 		}
 		
 		// Send the form content to MailChimp List without double opt-in
@@ -186,6 +186,7 @@ class Wh_Cf7mc_Connector_Public {
 			//this is for debug purposes
 		    $debug = array(
 		    'time' => date('Y.m.d H:i:s e P'),
+		    'NL var' => $newsletter,
 		    'Api key' => $mailchimp_api_key,
 		    'List id' => $mailchimp_list_id,
 		    'formtitle' => $formtitle,

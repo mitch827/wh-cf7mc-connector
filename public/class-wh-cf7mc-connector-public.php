@@ -126,14 +126,12 @@ class Wh_Cf7mc_Connector_Public {
 		 * @param mixed $posted_data
 		 * @return $retMCdata
 		 */
-		function data_for_mailchimp( $formtitle, $posted_data){
-			$newsletter = (bool) get_option( $this->option_name . '_nl' );
-			$contactform = (bool) get_option( $this->option_name . '_cf' );
+		function data_for_mailchimp( $formtitle, $posted_data, $args ){
 			
-			if (!$newsletter && !$contactform){
+			if (!$args['nl'] && !$args['cf']){
 				return;
 			}
-			if ($newsletter){
+			if ($args['nl']){
 	
 				$mergeVars = array(
 					'GROUPINGS'=>array( 
@@ -142,7 +140,7 @@ class Wh_Cf7mc_Connector_Public {
 				);		
 				$send_this_email = $posted_data['email-nl'];
 			}
-			if ($contactform){
+			if ($args['cf']){
 				//Mailchimp optin
 				if( $posted_data['mailchimp-optin'] ){
 					
@@ -162,8 +160,12 @@ class Wh_Cf7mc_Connector_Public {
 			 
 			return $retMCdata;
 		}
+		
+		$args = array(
+				'nl' => (bool) get_option( $this->option_name . '_nl' ),
+				'cf' => (bool) get_option( $this->option_name . '_cf' )
+		);
 	
-
 		$formtitle = $cfdata->title;
 		$submission = WPCF7_Submission::get_instance();
 		$mailchimp_api_key = get_option( 'api_key' );
@@ -182,13 +184,13 @@ class Wh_Cf7mc_Connector_Public {
 	
 		if ( $honeypot_opt == 1){
 			if (strlen($honeypot) == 0){
-			  	$data = data_for_mailchimp( $formtitle, $posted_data);
+			  	$data = data_for_mailchimp( $formtitle, $posted_data, $args);
 			} else {
 				
 				return false;
 			}
 		} else {
-			$data = data_for_mailchimp( $formtitle, $posted_data);
+			$data = data_for_mailchimp( $formtitle, $posted_data, $args);
 		}
 		
 		// Send the form content to MailChimp List without double opt-in
@@ -198,6 +200,7 @@ class Wh_Cf7mc_Connector_Public {
 			//this is for debug purposes
 		    $debug = array(
 		    'time' => date('Y.m.d H:i:s e P'),
+		    'Control args' => $args,
 		    'Api key' => $mailchimp_api_key,
 		    'List id' => $mailchimp_list_id,
 		    'formtitle' => $formtitle,

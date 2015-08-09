@@ -218,8 +218,8 @@ class Wh_Cf7mc_Connector_Admin {
 
 		register_setting( $this->plugin_name . '_mailchimp_account', 'api_key','strval' );
 		register_setting( $this->plugin_name . '_mailchimp_account', 'list_id', array( $this, $this->option_name . '_sanitize_code' )  );
-		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_nl', array( $this, $this->option_name . '_sanitize_code' )  );
-		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_cf', array( $this, $this->option_name . '_sanitize_code' )  );
+		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_nl' );
+		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_cf' );
 		register_setting( $this->plugin_name . '_extra', 'honeypot', array( $this, $this->option_name . '_sanitize_code' )  );
 		register_setting( $this->plugin_name . '_extra', 'debug', array( $this, $this->option_name . '_sanitize_code' )  );
 
@@ -232,7 +232,21 @@ class Wh_Cf7mc_Connector_Admin {
 	 * @since  1.0.0
 	 */
 	public function wh_Cf7mc_Connector_general_cb() {
-	    echo '<p>' . __( 'Set up your Mailchimp account.', 'wh-cf7mc-connector' ) . '</p>';
+	    ?>
+	    <div id ="welcome-panel" class="welcome-panel">
+		    <div class="welcome-panel-content">
+				<div class="welcome-panel-column" style="width: 50%;">
+					<h4><?php _e("How to use", "wh-cf7mc-connector"); ?></h4>
+					<p class="message">
+						<?php _e( 'Remember to use this labels on Mailchimp, groupings: <ul><li>Group details: <strong>"Dal sito"</strong></li><li>Group names: <strong>CF7 form name</strong></li></ul>', 'wh-cf7mc-connector' ); ?>
+					</p>
+					<p class="message">
+						Standard CF7 form names: <code>Iscrizione newsletter</code>, <code>Contact form</code>
+					</p>
+				</div>
+		    </div>
+	    </div>
+	    <?php
 	}
 	
 	public function wh_Cf7mc_Connector_form_data_cb() {
@@ -242,22 +256,18 @@ class Wh_Cf7mc_Connector_Admin {
 			    
 			    <div class="welcome-panel-column" style="width: 50%;">
 				    <h4><?php _e("How to use", "wh-cf7mc-connector"); ?></h4>
-				    <p class="message">
-					    <?php _e( 'Remember to use this labels on Mailchimp, groupings: <ul><li>Group name: <strong>"Dal sito"</strong></li><li>Grouping: <strong>Nome form</strong></li></ul>', 'wh-cf7mc-connector' ); ?>
-				    </p>
-				</div>
-			    
-			    <div class="welcome-panel-column" style="width: 50%;">
 				    <p class="message">Use these contact forms:</p>
-				    <p class="message"><strong>Form name: "Inscrizione Newsletter"</strong><br/>
+				    <p class="message"><strong>Form name: "Iscrizione Newsletter"</strong><br/>
 					    <code>
 						    [text honeypot class:honeypot]<br/>
 						    [email* email-nl placeholder akismet:author_email "Indirizzo email.."]<br/>
 						    [submit class:button class:tiny "Iscriviti"]
 						</code>
 					</p>
-				    
-				    <p class="message"><strong>Form name: "Inscrizione Newsletter"</strong><br/>
+				</div>
+			    
+			    <div class="welcome-panel-column" style="width: 50%;">
+				    <p class="message"><strong>Form name: "Contact form"</strong><br/>
 					    <code>
 					    	[email* email-cf placeholder akismet:author_email "paolo@rossi.com"]<br/>
 						    [textarea* textarea-cf placeholder "messaggio..."]<br/>
