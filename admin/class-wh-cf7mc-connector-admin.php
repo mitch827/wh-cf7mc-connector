@@ -118,7 +118,7 @@ class Wh_Cf7mc_Connector_Admin {
 	 
 	    $this->plugin_screen_hook_suffix = add_submenu_page(
 	    'wpcf7', 
-	    __( 'Web Heroes Contact Form 7 Mailchimp Connector', 'wh-cf7mc-connector' ), 
+	    __( 'Web Heroes CF7 - Mailchimp Connector', 'wh-cf7mc-connector' ), 
 	    __( 'Mailchimp', 'wh-cf7mc-connector' ), 
 	    'manage_options', 
 	    $this->plugin_name, 
@@ -145,14 +145,28 @@ class Wh_Cf7mc_Connector_Admin {
 		    $this->option_name . '_general',
 		    __( 'General', 'wh-cf7mc-connector' ),
 		    array( $this, $this->option_name . '_general_cb' ),
-		    $this->plugin_name
+		    $this->plugin_name . '_mailchimp_account'
+		);
+		
+		add_settings_section(
+		    $this->option_name . '_extra',
+		    __( 'Extra', 'wh-cf7mc-connector' ),
+		    array( $this, $this->option_name . '_extra_cb' ),
+		    $this->plugin_name . '_extra'
+		);
+		
+		add_settings_section(
+		    $this->option_name . '_form_data',
+		    __( 'Form Data', 'wh-cf7mc-connector' ),
+		    array( $this, $this->option_name . '_form_data_cb' ),
+		    $this->plugin_name . '_form_data'
 		);
 		
 		add_settings_field(
 		    'api_key',
 		    __( 'Mailchimp API key', 'wh-cf7mc-connector' ),
 		    array( $this, $this->option_name . '_api_key_cb' ),
-		    $this->plugin_name,
+		    $this->plugin_name . '_mailchimp_account',
 		    $this->option_name . '_general',
 		    array( 'label_for' => 'api_key' )
 		);
@@ -161,7 +175,7 @@ class Wh_Cf7mc_Connector_Admin {
 		    'list_id',
 		    __( 'List ID', 'wh-cf7mc-connector' ),
 		    array( $this, $this->option_name . '_list_id_cb' ),
-		    $this->plugin_name,
+		    $this->plugin_name . '_mailchimp_account',
 		    $this->option_name . '_general',
 		    array( 'label_for' => 'list_id' )
 		);
@@ -170,8 +184,8 @@ class Wh_Cf7mc_Connector_Admin {
 		    'honeypot',
 		    __( 'Honeypot', 'wh-cf7mc-connector' ),
 		    array( $this, $this->option_name . '_honeypot_cb' ),
-		    $this->plugin_name,
-		    $this->option_name . '_general',
+		    $this->plugin_name . '_extra',
+		    $this->option_name . '_extra',
 			array( 'label_for' => 'honeypot' )
 		);
 		
@@ -179,15 +193,15 @@ class Wh_Cf7mc_Connector_Admin {
 		    'debug',
 		    __( 'Debug', 'wh-cf7mc-connector' ),
 		    array( $this, $this->option_name . '_debug_cb' ),
-		    $this->plugin_name,
-		    $this->option_name . '_general',
+		    $this->plugin_name . '_extra',
+		    $this->option_name . '_extra',
 			array( 'label_for' => 'debug' )
 		);
 
-		register_setting( $this->plugin_name, 'api_key','strval' );
-		register_setting( $this->plugin_name, 'list_id', array( $this, $this->option_name . '_sanitize_code' )  );
-		register_setting( $this->plugin_name, 'honeypot', array( $this, $this->option_name . '_sanitize_code' )  );
-		register_setting( $this->plugin_name, 'debug', array( $this, $this->option_name . '_sanitize_code' )  );
+		register_setting( $this->plugin_name . '_mailchimp_account', 'api_key','strval' );
+		register_setting( $this->plugin_name . '_mailchimp_account', 'list_id', array( $this, $this->option_name . '_sanitize_code' )  );
+		register_setting( $this->plugin_name . '_extra', 'honeypot', array( $this, $this->option_name . '_sanitize_code' )  );
+		register_setting( $this->plugin_name . '_extra', 'debug', array( $this, $this->option_name . '_sanitize_code' )  );
 
 	//	register_setting( $this->plugin_name, $this->option_name . '_day', array( $this, $this->option_name . '_sanitize_position' ) );
 	}
@@ -198,7 +212,15 @@ class Wh_Cf7mc_Connector_Admin {
 	 * @since  1.0.0
 	 */
 	public function wh_Cf7mc_Connector_general_cb() {
-	    echo '<p>' . __( 'Insert code to be printed in the theme footer.', 'wh-hfcode' ) . '</p>';
+	    echo '<p>' . __( 'Set up your Mailchimp account.', 'wh-cf7mc-connector' ) . '</p>';
+	}
+	
+	public function wh_Cf7mc_Connector_form_data_cb() {
+	    echo '<p>' . __( 'Optins and groupings values', 'wh-cf7mc-connector' ) . '</p>';
+	}
+	
+	public function wh_Cf7mc_Connector_extra_cb() {
+	    echo '<p>' . __( 'Antispam & debug options.', 'wh-cf7mc-connector' ) . '</p>';
 	}
 	
 	/**
