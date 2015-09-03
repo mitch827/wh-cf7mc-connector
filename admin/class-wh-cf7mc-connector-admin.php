@@ -117,9 +117,9 @@ class Wh_Cf7mc_Connector_Admin {
 	public function add_options_page() {
 	 
 	    $this->plugin_screen_hook_suffix = add_submenu_page(
-	    'wpcf7', 
+	    'web-heroes', 
 	    __( 'Web Heroes CF7 - Mailchimp Connector', 'wh-cf7mc-connector' ), 
-	    __( 'Mailchimp', 'wh-cf7mc-connector' ), 
+	    __( 'CF7 - Mailchimp', 'wh-cf7mc-connector' ), 
 	    'manage_options', 
 	    $this->plugin_name, 
 	    array( $this, 'display_options_page' ) );
