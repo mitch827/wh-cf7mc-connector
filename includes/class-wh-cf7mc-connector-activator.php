@@ -29,8 +29,11 @@ class Wh_Cf7mc_Connector_Activator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function activate() {
-
+	public static function activate($plugin_base) {
+		
+		if ( ! is_plugin_active( "web-heroes/web-heroes.php" ) ){
+			deactivate_plugins( $plugin_base );
+			wp_die( "<a href='https://github.com/mitch827/web-heroes'><b>Web Heroes Enhancements plugin</b></a> is required.<br><br>Go back to <a href='" . get_admin_url(null, 'plugins.php') . "'>plugins page</a>." );
+     	}
 	}
-
 }
