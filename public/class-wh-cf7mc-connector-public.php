@@ -169,7 +169,15 @@ class Wh_Cf7mc_Connector_Public {
 		$formtitle = $cfdata->title;
 		$submission = WPCF7_Submission::get_instance();
 		$mailchimp_api_key = get_option( 'api_key' );
-		$mailchimp_list_id = get_option( 'list_id' );
+		$multilang = (bool) get_option( $this->option_name . '_multilanguage');
+		if ( ! $multilang ){
+			$mailchimp_list_id = get_option( 'list_id' );
+		} else {
+			$languages = get_option( $this->option_name . '_lang');
+			foreach( $languages as $lang){
+				$mailchimp_multilang_list_id[]= get_option( $this->option_name . '_list_id_' . $lang);
+			}
+		}
 		$mailchimp_debug = get_option( 'debug' );
 		$honeypot_opt = get_option( 'honeypot' );
 		
@@ -194,7 +202,37 @@ class Wh_Cf7mc_Connector_Public {
 		}
 		
 		// Send the form content to MailChimp List without double opt-in
-		$retval = $api->listSubscribe($mailchimp_list_id, $data['send_this_email'], $data['mergeData']);
+		if ( ! $multilang ){
+			$retval = $api->listSubscribe($mailchimp_list_id, $data['send_this_email'], $data['mergeData']);
+		} else {
+			if ( defined( 'ICL_LANGUAGE_CODE' ) ){
+				switch (ICL_LANGUAGE_CODE){
+					case 'en':
+						$retval = $api->listSubscribe($mailchimp_multilang_list_id['en'], $data['send_this_email'], $data['mergeData']);
+						break;
+					case 'fr':
+						$retval = $api->listSubscribe($mailchimp_multilang_list_id['fr'], $data['send_this_email'], $data['mergeData']);
+						break;
+					case 'de':
+						$retval = $api->listSubscribe($mailchimp_multilang_list_id['de'], $data['send_this_email'], $data['mergeData']);
+						break;
+					case 'it':
+						$retval = $api->listSubscribe($mailchimp_multilang_list_id['it'], $data['send_this_email'], $data['mergeData']);
+						break;
+					case 'pt':
+						$retval = $api->listSubscribe($mailchimp_multilang_list_id['pt'], $data['send_this_email'], $data['mergeData']);
+						break;
+					case 'es':
+						$retval = $api->listSubscribe($mailchimp_multilang_list_id['es'], $data['send_this_email'], $data['mergeData']);
+						break;
+					default:
+						$retval = $api->listSubscribe($mailchimp_list_id, $data['send_this_email'], $data['mergeData']);
+						break;
+				}
+			} else {
+				wp_die("For multilanguage forms you have to download and install WPML plugin.<br><br>Go back to <a href='" . get_admin_url(null, 'plugins.php') . "'>plugins page</a>.");
+			}
+		}
 		
 		if ( $mailchimp_debug == 1 ){
 			//this is for debug purposes
@@ -208,7 +246,12 @@ class Wh_Cf7mc_Connector_Public {
 		    'email' => $data['send_this_email'],
 		    'mergevars' => $data['mergeData'],
 		    'result' => $retval,
+		    'WPML' => defined( 'ICL_LANGUAGE_CODE' ) ? 'yes' : 'no',
+		    'languages' => array()
 		    );
+		    foreach ( $languages as $lang ){
+			    $debug['languages'][] = $lang;
+		    }
 		    $test_file = fopen('devlog.txt', 'a');
 		    $test_result = fwrite($test_file, print_r($debug, TRUE));
 		}
