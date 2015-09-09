@@ -29,3 +29,4 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+delete_option( 'wh_Cf7mc_Connector_lang' );

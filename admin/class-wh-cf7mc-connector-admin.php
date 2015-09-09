@@ -79,7 +79,7 @@ class Wh_Cf7mc_Connector_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 		$this->multilang = (bool) get_option( $this->option_name . '_multilanguage' );
-		$this->languages =  get_option( $this->option_name . '_lang' );
+		$this->languages =  get_option( $this->option_name . '_lang', array() );
 
 	}
 	
@@ -276,9 +276,11 @@ class Wh_Cf7mc_Connector_Admin {
 		register_setting( $this->plugin_name . '_mailchimp_account', 'api_key','strval' );
 		register_setting( $this->plugin_name . '_mailchimp_account', 'list_id', array( $this, $this->option_name . '_sanitize_code' )  );
 		register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_lang' );
-		foreach( $this->languages as $lang ) :
-			register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_list_id_' . $lang);
-		endforeach;
+		if( $this->languages ){
+			foreach( $this->languages as $lang ) :
+				register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_list_id_' . $lang);
+			endforeach;
+		}
 		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_nl' );
 		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_cf' );
 		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_multilanguage' );
@@ -574,7 +576,7 @@ class Wh_Cf7mc_Connector_Admin {
 			<select id="lang" name="<?php echo $this->option_name . '_lang[]'; ?>" multiple="multiple" style="width: 200px; height:200px;">
 				<?php 
 					foreach ( $lang_code as $code_name => $code ) :
-						echo '<option value="' . $code . '"' . selected( true, in_array($code, $this->languages), false ) . '>' . $code_name . '</option>';
+						echo '<option value="' . $code . '"' . (( ! $this->languages )? '' : selected( true, in_array($code, $this->languages), false ) ) . '>' . $code_name . '</option>';
 					endforeach;
 				?>
 			</select>
