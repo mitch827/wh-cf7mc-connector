@@ -65,7 +65,7 @@ class Wh_Cf7mc_Connector_Admin {
 	 * @access   private
 	 * @var      array    $languages    Languages of the contact forms.
 	 */
-	private $languages;
+	private $languages = [];
 
 	/**
 	 * Initialize the class and set its properties.
@@ -78,8 +78,8 @@ class Wh_Cf7mc_Connector_Admin {
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
-		$this->multilang = (bool) get_option( $this->option_name . '_multilanguage' );
-		$this->languages =  get_option( $this->option_name . '_lang', array() );
+		
+		$this->languages =  get_option( $this->option_name . '_lang' );
 
 	}
 	
@@ -88,7 +88,7 @@ class Wh_Cf7mc_Connector_Admin {
 	 *
 	 * @since    1.0.0
 	 */
-	// public function enqueue_styles() {
+	public function enqueue_styles() {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -102,16 +102,16 @@ class Wh_Cf7mc_Connector_Admin {
 		 * class.
 		 */
 
-	//	wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wh-cf7mc-connector-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wh-cf7mc-connector-admin.css', array(), $this->version, 'all' );
 
-//	}
+	}
 
 	/**
 	 * Register the JavaScript for the admin area.
 	 *
 	 * @since    1.0.0
 	 */
-	//public function enqueue_scripts() {
+	public function enqueue_scripts() {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -125,9 +125,9 @@ class Wh_Cf7mc_Connector_Admin {
 		 * class.
 		 */
 
-	//	wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wh-cf7mc-connector-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wh-cf7mc-connector-admin.js', array( 'jquery' ), $this->version, false );
 
-//	}
+	}
 
 	/**
 	 * Add an options page under the Settings submenu
@@ -161,9 +161,9 @@ class Wh_Cf7mc_Connector_Admin {
 	 */
 	public function register_setting() {
 		
-		// Add a General section
+		// Add sections
 		add_settings_section(
-		    $this->option_name . '_general',
+		    $this->option_name . '_mailchimp_account',
 		    __( 'General', 'wh-cf7mc-connector' ),
 		    array( $this, $this->option_name . '_general_cb' ),
 		    $this->plugin_name . '_mailchimp_account'
@@ -183,111 +183,112 @@ class Wh_Cf7mc_Connector_Admin {
 		    $this->plugin_name . '_form_data'
 		);
 		
+		//Add settings fields
 		add_settings_field(
-		    'api_key',
+		    $this->option_name . '_api_key',
 		    __( 'Mailchimp API key', 'wh-cf7mc-connector' ),
 		    array( $this, $this->option_name . '_api_key_cb' ),
 		    $this->plugin_name . '_mailchimp_account',
-		    $this->option_name . '_general',
-		    array( 'label_for' => 'api_key' )
+		    $this->option_name . '_mailchimp_account',
+		    array( 'label_for' => $this->option_name . '_api_key' )
 		);
-		
-		if( ! $this->multilang ){
-			add_settings_field(
-			    'list_id',
-			    __( 'List ID', 'wh-cf7mc-connector' ),
-			    array( $this, $this->option_name . '_list_id_cb' ),
-			    $this->plugin_name . '_mailchimp_account',
-			    $this->option_name . '_general',
-			    array( 'label_for' => 'list_id' )
-			);
-		}
-		if( $this->multilang ){
+
+		if ( defined( 'ICL_LANGUAGE_CODE' ) ){
 			add_settings_field(
 			    $this->option_name . '_lang',
 			    __( 'Languages', 'wh-cf7mc-connector' ),
 			    array( $this, $this->option_name . '_lang_cb' ),
 			    $this->plugin_name . '_mailchimp_account',
-			    $this->option_name . '_general',
+			    $this->option_name . '_mailchimp_account',
 			    array( 'label_for' => $this->option_name . '_lang' )
 			);
-		}
-		if( $this->multilang ){
-			if( $this->languages ){
+		
+			if ( isset( $this->languages ) && !empty( $this->languages ) ){
 				foreach ( $this->languages as $lang ){
 					add_settings_field(
-						$this->option_name . '_list_id_' . $lang,
+						$this->option_name . '_list_id[ ' . $lang . ']',
 						__( 'List ID', 'wh-cf7mc-connector'). ' '.  $lang,
-						array( $this, $this->option_name . '_multilang_list_id_cb_'. $lang ),
+						array( $this, $this->option_name . '_list_id_cb' ),
 						$this->plugin_name . '_mailchimp_account',
-						$this->option_name . '_general',
-						array( 'label_for' => 'list_id_'. $lang )
+						$this->option_name . '_mailchimp_account',
+						$param = array( 
+							'label_for' => $this->option_name . '_list_id[ ' . $lang . ']',
+							'language' 	=> $lang
+						)
 					);
+					register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_list_id' );
 				}
 			}
+		} else {
+			add_settings_field(
+			     $this->option_name . '_list_id',
+			    __( 'List ID', 'wh-cf7mc-connector' ),
+			    array( $this, $this->option_name . '_list_id_cb' ),
+			    $this->plugin_name . '_mailchimp_account',
+			    $this->option_name . '_mailchimp_account',
+			    $param = array( 
+					'label_for' => $this->option_name . '_list_id',
+					'language' 	=> FALSE
+				)
+			);
+			register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_list_id' );
 		}
 			
 		add_settings_field(
 		    $this->option_name . '_nl',
 		    __( 'Newsletter subscription form', 'wh-cf7mc-connector' ),
-		    array( $this, $this->option_name . '_nl_cb' ),
+		    array( $this, $this->option_name . '_checkbox_cb' ),
 		    $this->plugin_name . '_form_data',
 		    $this->option_name . '_form_data',
-		    array( 'label_for' => $this->option_name . '_nl' )
+		    $param = array( 
+		    	'label_for' => $this->option_name . '_nl',
+		    	'type' 		=> 'nl'
+		    )
 		);
 		
 		add_settings_field(
 		    $this->option_name . '_cf',
 		    __( 'Complete contact form', 'wh-cf7mc-connector' ),
-		    array( $this, $this->option_name . '_cf_cb' ),
+		    array( $this, $this->option_name . '_checkbox_cb' ),
 		    $this->plugin_name . '_form_data',
 		    $this->option_name . '_form_data',
-		    array( 'label_for' => $this->option_name . '_cf' )
+		    $param = array( 
+		    	'label_for' => $this->option_name . '_cf',
+		    	'type' 		=> 'cf'
+		    )
 		);
 		
 		add_settings_field(
-			$this->option_name . "_multilanguage",
-			__( "Multilanguage forms", "wh-cf7mc-connector" ),
-			array( $this, $this->option_name . "_multilanguage_cb"),
-			$this->plugin_name . "_form_data",
-			$this->option_name . '_form_data',
-			array( 'label_for' => $this->option_name . "_multilanguage" )
-			
-		);
-		
-		add_settings_field(
-		    'honeypot',
+		    $this->option_name . '_honeypot',
 		    __( 'Honeypot', 'wh-cf7mc-connector' ),
-		    array( $this, $this->option_name . '_honeypot_cb' ),
+		    array( $this, $this->option_name . '_checkbox_cb' ),
 		    $this->plugin_name . '_extra',
 		    $this->option_name . '_extra',
-			array( 'label_for' => 'honeypot' )
+			$param = array( 
+				'label_for' => $this->option_name . '_honeypot',
+				'type' 		=> 'honeypot'
+			)
 		);
 		
 		add_settings_field(
-		    'debug',
+		    $this->option_name . '_debug',
 		    __( 'Debug', 'wh-cf7mc-connector' ),
-		    array( $this, $this->option_name . '_debug_cb' ),
+		    array( $this, $this->option_name . '_checkbox_cb' ),
 		    $this->plugin_name . '_extra',
 		    $this->option_name . '_extra',
-			array( 'label_for' => 'debug' )
+			$param = array( 
+				'label_for' => $this->option_name . '_debug',
+				'type' 		=> 'debug'
+			)
 		);
 
-		register_setting( $this->plugin_name . '_mailchimp_account', 'api_key','strval' );
-		register_setting( $this->plugin_name . '_mailchimp_account', 'list_id', array( $this, $this->option_name . '_sanitize_code' )  );
+		register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_api_key','strval' );
+		register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_list_id', array( $this, $this->option_name . '_sanitize_code' )  );
 		register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_lang' );
-		if( $this->languages ){
-			foreach( $this->languages as $lang ) :
-				register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_list_id_' . $lang);
-			endforeach;
-		}
 		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_nl' );
 		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_cf' );
-		register_setting( $this->plugin_name . '_form_data', $this->option_name . '_multilanguage' );
-		register_setting( $this->plugin_name . '_extra', 'honeypot', array( $this, $this->option_name . '_sanitize_code' )  );
-		register_setting( $this->plugin_name . '_extra', 'debug', array( $this, $this->option_name . '_sanitize_code' )  );
-
-	//	register_setting( $this->plugin_name, $this->option_name . '_day', array( $this, $this->option_name . '_sanitize_position' ) );
+		register_setting( $this->plugin_name . '_extra', $this->option_name . '_honeypot', array( $this, $this->option_name . '_sanitize_code' )  );
+		register_setting( $this->plugin_name . '_extra', $this->option_name . '_debug', array( $this, $this->option_name . '_sanitize_code' )  );
 	}
 	
 	/**
@@ -305,7 +306,7 @@ class Wh_Cf7mc_Connector_Admin {
 						<?php _e( 'Remember to use this labels on Mailchimp, groupings: <ul><li>Group details: <strong>"Dal sito"</strong></li><li>Group names: <strong>CF7 form name</strong></li></ul>', 'wh-cf7mc-connector' ); ?>
 					</p>
 					<p class="message">
-						Standard CF7 form names: <code>Iscrizione newsletter</code>, <code>Contact form</code>
+						<?php _e('Standard CF7 form names', 'wh-cf7mc-connector'); ?>: <code>Iscrizione newsletter</code>, <code>Contact form</code>
 					</p>
 				</div>
 		    </div>
@@ -317,7 +318,6 @@ class Wh_Cf7mc_Connector_Admin {
 	    ?>
 	    <div id ="welcome-panel" class="welcome-panel">
 		    <div class="welcome-panel-content">
-			    
 			    <div class="welcome-panel-column" style="width: 50%;">
 				    <h4><?php _e("How to use", "wh-cf7mc-connector"); ?></h4>
 				    <p class="message">Use these contact forms:</p>
@@ -329,7 +329,6 @@ class Wh_Cf7mc_Connector_Admin {
 						</code>
 					</p>
 				</div>
-			    
 			    <div class="welcome-panel-column" style="width: 50%;">
 				    <p class="message"><strong>Form name: "Contact form"</strong><br/>
 					    <code>
@@ -342,7 +341,6 @@ class Wh_Cf7mc_Connector_Admin {
 						</code>
 					</p>
 			    </div>
-			    
 		    </div>
 	    </div>
 	    
@@ -352,39 +350,64 @@ class Wh_Cf7mc_Connector_Admin {
 	public function wh_Cf7mc_Connector_extra_cb() {
 	    echo '<p>' . __( 'Antispam & debug options.', 'wh-cf7mc-connector' ) . '</p>';
 	}
-	
+	 
 	/**
-	 * Render the option fields
+	 * wh_Cf7mc_Connector_api_key_cb function.
+	 * 
+	 * Render an input field to enter the Mailchimp API key
 	 *
-	 * @since  1.0.0
+	 * @access public
+	 * @return void
 	 */
 	public function wh_Cf7mc_Connector_api_key_cb() {
-		$api_key = get_option( 'api_key' );
+		$api_key = get_option( $this->option_name . '_api_key' );
 		?>
-			<input style="width: 50%;" type="text" name="api_key" id="api_key" value="<?php echo $api_key; ?>" />
+			<input style="width: 50%;" type="text" name="<?php echo $this->option_name . '_api_key'; ?>" id="api_key" value="<?php echo $api_key; ?>" />
 			<p class="description">Generate an API Key inside your Mailchimp account settings page.</p>
+		<?php
+	}
+	
+	/**
+	 * wh_Cf7mc_Connector_lang_cb function.
+	 * 
+	 * Render a multiselect field based on the languages active on the site.
+	 *
+	 * @access public
+	 * @return void
+	 */
+	public function wh_Cf7mc_Connector_lang_cb() {
+		if ( defined( 'ICL_LANGUAGE_CODE' ) ){
+			$lang_code = apply_filters( 'wpml_active_languages', NULL ); //get current installed languages
+			?>
 			
-		<?php
+			<select id="lang" name="<?php echo $this->option_name . '_lang[]'; ?>" multiple="multiple" style="width: 200px; height:200px;">
+				<?php 
+					foreach ( $lang_code as $lang_name ) :
+						echo '<option value="' . $lang_name['language_code'] . '"' . (( ! $this->languages )? '' : selected( true, in_array($lang_name['language_code'], $this->languages), false ) ) . '>' . $lang_name['translated_name'] . '</option>';
+					endforeach;
+				?>
+			</select>
+			<p class="description">Select languages and <strong>save the form</strong>. You'll be able to selects different list ids for the languages chosen.</p>
+			
+			<?php
+		}		
 	}
 	
-	public function wh_Cf7mc_Connector_multilanguage_cb() {
-		?>
-			<label>
-			<input type="checkbox" name="<?php echo $this->option_name . '_multilanguage'; ?>" value="1" <?php checked( $this->multilang , 1 ); ?> > Multilanguage site
-			</label>
-			<p class="description">Checking this, you'll be able to select <strong> the languages</strong>for different list IDs. Save the form to see the languages.</p>
-		<?php
-	}
-	
+	/**
+	 * wh_get_mailchimp_lists function.
+	 *
+	 * Helper method to retrive list from Mailchimp.
+	 * 
+	 * @access public
+	 * @return void
+	 */
 	public function wh_get_mailchimp_lists() {
-		$wh_api = get_option( 'api_key' );
+		$api_key = get_option( $this->option_name . '_api_key' );
 		
-		if ( ! empty( $wh_api ) ) {
+		if ( ! empty( $api_key ) ) {
 			
-			$api_key = trim( $wh_api );
-	
+			$api_key = trim( $api_key );
 			$lists = array();
-			
 			$api = new MCAPI( $api_key );
 			$list_data = $api->lists();
 			if ( $list_data ) {
@@ -398,14 +421,39 @@ class Wh_Cf7mc_Connector_Admin {
 		return false;
 	}
 	
-	public function wh_Cf7mc_Connector_list_id_cb() {
+	/**
+	 * wh_Cf7mc_Connector_list_id_cb function.
+	 *
+	 * this function creates a select Mailchimp list ID for every language selected
+	 * 
+	 * @access public
+	 * @param mixed $param -> languages code.
+	 * @return void
+	 */
+	public function wh_Cf7mc_Connector_list_id_cb( $param ) {
 		
-		$lists = $this->wh_get_mailchimp_lists();
-		$list_id = get_option( 'list_id' );
+		$lists = $this->wh_get_mailchimp_lists(); 					//get mailchimp lists
+		$list_id = get_option( $this->option_name . '_list_id' );	//get selected list IDs
+		$lang = $param['language'];									//function parameter
 		
-		if( ! $this->multilang ){
+		if ( false !== $lang ){
 			?>
-				<select id="list_id" name="list_id">
+				<select id="<?php echo 'list_id_' . $lang; ?>" name="<?php echo $this->option_name . '_list_id[' . $lang . ']'; ?>">
+					<?php
+						if ( $lists ) :
+							foreach ( $lists as $list ) :
+								echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $list_id[ $lang ], $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
+							endforeach;
+						else :
+					?>
+					<option value="no list"><?php _e( 'no lists', 'wh-mailchimp-cf7-connector' ); ?></option>
+				<?php endif; ?>
+				</select>
+				
+			<?php
+		} else {
+			?>
+				<select id="list_id" name="<?php echo $this->option_name . '_list_id'; ?>">
 					<?php
 						if ( $lists ) :
 							foreach ( $lists as $list ) :
@@ -422,212 +470,39 @@ class Wh_Cf7mc_Connector_Admin {
 		}
 	}
 	
-	public function wh_Cf7mc_Connector_multilang_list_id_cb_en() {
-		
-		$lists = $this->wh_get_mailchimp_lists();
-		$list_id_en = get_option( $this->option_name . '_list_id_en' );
-		
-		if( $this->multilang ){
-			?>
-				<select id="list_id_en" name="<?php echo $this->option_name . '_list_id_en'; ?>">
-					<?php
-						if ( $lists ) :
-							foreach ( $lists as $list ) :
-								echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $list_id_en, $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
-							endforeach;
-						else :
-					?>
-					<option value="no list"><?php _e( 'no lists', 'wh-mailchimp-cf7-connector' ); ?></option>
-				<?php endif; ?>
-				</select>
-				
-			<?php
-		}
-	}
 	
-	public function wh_Cf7mc_Connector_multilang_list_id_cb_fr() {
-		
-		$lists = $this->wh_get_mailchimp_lists();
-		$list_id_fr = get_option( $this->option_name . '_list_id_fr' );
-		
-		if( $this->multilang ){
-			?>
-				<select id="list_id_fr" name="<?php echo $this->option_name . '_list_id_fr'; ?>">
-					<?php
-						if ( $lists ) :
-							foreach ( $lists as $list ) :
-								echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $list_id_fr, $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
-							endforeach;
-						else :
-					?>
-					<option value="no list"><?php _e( 'no lists', 'wh-mailchimp-cf7-connector' ); ?></option>
-				<?php endif; ?>
-				</select>
-				
-			<?php
-		}
-	}
-	
-	public function wh_Cf7mc_Connector_multilang_list_id_cb_de() {
-		
-		$lists = $this->wh_get_mailchimp_lists();
-		$list_id_de = get_option( $this->option_name . '_list_id_de' );
-		
-		if( $this->multilang ){
-			?>
-				<select id="list_id_de" name="<?php echo $this->option_name . '_list_id_de'; ?>">
-					<?php
-						if ( $lists ) :
-							foreach ( $lists as $list ) :
-								echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $list_id_de, $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
-							endforeach;
-						else :
-					?>
-					<option value="no list"><?php _e( 'no lists', 'wh-mailchimp-cf7-connector' ); ?></option>
-				<?php endif; ?>
-				</select>
-				
-			<?php 
-		}
-	}
-	
-	public function wh_Cf7mc_Connector_multilang_list_id_cb_it() {
-		
-		$lists = $this->wh_get_mailchimp_lists();
-		$list_id_it = get_option( $this->option_name . '_list_id_it' );
-		
-		if( $this->multilang ){
-			?>
-				<select id="list_id_it" name="<?php echo $this->option_name . '_list_id_it'; ?>">
-					<?php
-						if ( $lists ) :
-							foreach ( $lists as $list ) :
-								echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $list_id_it, $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
-							endforeach;
-						else :
-					?>
-					<option value="no list"><?php _e( 'no lists', 'wh-mailchimp-cf7-connector' ); ?></option>
-				<?php endif; ?>
-				</select>
-				
-			<?php
-		}
-	}
-	
-	public function wh_Cf7mc_Connector_multilang_list_id_cb_pt() {
-		
-		$lists = $this->wh_get_mailchimp_lists();
-		$list_id_pt = get_option( $this->option_name . '_list_id_pt' );
-		
-		if( $this->multilang ){
-			?>
-				<select id="list_id_pt" name="<?php echo $this->option_name . '_list_id_pt'; ?>">
-					<?php
-						if ( $lists ) :
-							foreach ( $lists as $list ) :
-								echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $list_id_pt, $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
-							endforeach;
-						else :
-					?>
-					<option value="no list"><?php _e( 'no lists', 'wh-mailchimp-cf7-connector' ); ?></option>
-				<?php endif; ?>
-				</select>
-				
-			<?php
-		}
-	}
-	
-	public function wh_Cf7mc_Connector_multilang_list_id_cb_es() {
-		
-		$lists = $this->wh_get_mailchimp_lists();
-		$list_id_es = get_option( $this->option_name . '_list_id_es' );
-		
-		if( $this->multilang ){
-			?>
-				<select id="list_id_es" name="<?php echo $this->option_name . '_list_id_es'; ?>">
-					<?php
-						if ( $lists ) :
-							foreach ( $lists as $list ) :
-								echo '<option value="' . esc_attr( $list['id'] ) . '"' . selected( $list_id_es, $list['id'], false ) . '>' . esc_html( $list['name'] ) . '</option>';
-							endforeach;
-						else :
-					?>
-					<option value="no list"><?php _e( 'no lists', 'wh-mailchimp-cf7-connector' ); ?></option>
-				<?php endif; ?>
-				</select>
-				
-			<?php
-		}
-	}
-	
-	public function wh_Cf7mc_Connector_lang_cb() {
-		
-		if( $this->multilang ){
-			$lang_code = array(
-				"English" 		=> "en",
-				"French" 		=> "fr",
-				"German" 		=> "de",
-				"Italian" 		=> "it",
-				"Portuguese" 	=> "pt",
-				"Spanish" 		=> "es"
-			);
-			?>
-			
-			<select id="lang" name="<?php echo $this->option_name . '_lang[]'; ?>" multiple="multiple" style="width: 200px; height:200px;">
-				<?php 
-					foreach ( $lang_code as $code_name => $code ) :
-						echo '<option value="' . $code . '"' . (( ! $this->languages )? '' : selected( true, in_array($code, $this->languages), false ) ) . '>' . $code_name . '</option>';
-					endforeach;
+	public function wh_Cf7mc_Connector_checkbox_cb( $param ) {
+		$type = $param['type'];
+		$check = get_option( $this->option_name . '_' . $type );
+		?>
+			<label>
+				<input type="checkbox" name="<?php echo $this->option_name . '_' . $type; ?>" value="1" <?php checked( $check , 1 ); ?> > 
+				<?php
+					if ( $type === 'nl' )
+						_e( 'Using newsletter subscription form', 'wh-mailchimp-cf7-connector' );
+					if ( $type === 'cf' )
+						_e( 'Using complete contact form', 'wh-mailchimp-cf7-connector' );
+					if ( $type === 'honeypot' )
+						_e( 'Use honeypot', 'wh-mailchimp-cf7-connector' );
+					if ( $type === 'debug' )
+						_e( 'Debug activated', 'wh-mailchimp-cf7-connector' );
 				?>
-			</select>
-			<p class="description">Select languages and <strong>save the form</strong>. You'll be able to selects different list ids for the languages chosen.</p>
-			<?php
-		}
-			
-	}
-	
-	public function wh_Cf7mc_Connector_nl_cb() {
-		$nl = get_option( $this->option_name . '_nl' );
-		?>
-			<label>
-			<input type="checkbox" name="<?php echo $this->option_name . '_nl'; ?>" value="1" <?php checked( $nl , 1 ); ?> > Using newsletter subscription form
 			</label>
-			<p class="description">Email field: <strong>"email-nl"</strong>.</p>
+			<p class="description">
+				<?php
+					if ( $type === 'nl' )
+						_e( 'Email field: <strong>"email-nl"</strong>.', 'wh-mailchimp-cf7-connector' );
+					if ( $type === 'cf' )
+						_e( 'Email field: <strong>"email-cf"</strong>. Newsletter subscription: <strong>"mailchimp-optin"</strong>', 'wh-mailchimp-cf7-connector' );
+					if ( $type === 'honeypot' )
+						_e( 'Insert an hidden field for spam prevention. <b>Put this shortcode in your forms:</b> <code>[text honeypot class:honeypot]</code>', 'wh-mailchimp-cf7-connector' );
+					if ( $type === 'debug' )
+						_e( 'Generate a file called <code>devlog.txt</code> in the site root folder for debug purpose.', 'wh-mailchimp-cf7-connector' );
+				?>
+			</p>
 		<?php
 	}
-	
-	public function wh_Cf7mc_Connector_cf_cb() {
-		$cf = get_option( $this->option_name . '_cf' );
-		?>
-			<label>
-			<input type="checkbox" name="<?php echo $this->option_name . '_cf'; ?>" value="1" <?php checked( $cf , 1 ); ?> > Using complete contact form
-			</label>
-			<p class="description">Email field: <strong>"email-cf"</strong>. Newsletter subscription: <strong>"mailchimp-optin"</strong>.</p>
-		<?php
-	}
-	
-	public function wh_Cf7mc_Connector_honeypot_cb() {
-		$honeypot = get_option( 'honeypot' );
-		?>	
-			<label>
-			<input type="checkbox" name="honeypot" value="1" <?php checked( $honeypot , 1 ); ?> > Use honeypot
-			</label>
-			<p class="description">Insert an hidden field for spam prevention. <b>Put this shortcode in your forms:</b> <code>[text honeypot class:honeypot]</code></p>
-			
-		<?php
-	}
-	
-	public function wh_Cf7mc_Connector_debug_cb() {
-		$debug = get_option( 'debug' );
-		?>	
-			<label>
-			<input type="checkbox" name="debug" value="1" <?php checked( $debug , 1 ); ?> > Debug activated
-			</label> 
-			<p class="description">Generate a file called <code>devlog.txt</code> in the site root folder for debug purpose.</p>
-			
-		<?php
-	}
-	
+		
 	/**
 	 * Sanitize the text position value before being saved to database
 	 *

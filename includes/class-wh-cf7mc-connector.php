@@ -120,7 +120,7 @@ class Wh_Cf7mc_Connector {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-wh-cf7mc-connector-public.php';
 		
 		/**
-		 * The class responsible for communicating eith MCAPI v.1.3
+		 * The class responsible for communicating with MCAPI v.1.3
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/MCAPI.class.php';
 				

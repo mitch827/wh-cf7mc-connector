@@ -68,7 +68,7 @@ class Wh_Cf7mc_Connector_Public {
 	 *
 	 * @since    1.0.0
 	 */
-	//public function enqueue_styles() {
+	public function enqueue_styles() {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -82,16 +82,16 @@ class Wh_Cf7mc_Connector_Public {
 		 * class.
 		 */
 
-	//	wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wh-cf7mc-connector-public.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wh-cf7mc-connector-public.css', array(), $this->version, 'all' );
 
-	//}
+	}
 
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
 	 *
 	 * @since    1.0.0
 	 */
-	//public function enqueue_scripts() {
+	public function enqueue_scripts() {
 
 		/**
 		 * This function is provided for demonstration purposes only.
@@ -105,9 +105,9 @@ class Wh_Cf7mc_Connector_Public {
 		 * class.
 		 */
 
-	//	wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wh-cf7mc-connector-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wh-cf7mc-connector-public.js', array( 'jquery' ), $this->version, false );
 
-	//}
+	}
 	
 	/**
 	 * wh_mailchimp_cf7_connect function.
@@ -116,7 +116,7 @@ class Wh_Cf7mc_Connector_Public {
 	 * @param mixed $cfdata
 	 * @return void
 	 */
-	public function wh_mailchimp_cf7_connect($cfdata) {
+	public function wh_mailchimp_cf7_connect( $cfdata ){
 		
 		/**
 		 * data_for_mailchimp function.
@@ -168,9 +168,9 @@ class Wh_Cf7mc_Connector_Public {
 	
 		$formtitle = $cfdata->title;
 		$submission = WPCF7_Submission::get_instance();
-		$mailchimp_api_key = get_option( 'api_key' );
-		$multilang = (bool) get_option( $this->option_name . '_multilanguage');
-		if ( ! $multilang ){
+		$mailchimp_api_key = get_option( $this->option_name . '_api_key' );
+
+		if ( defined( 'ICL_LANGUAGE_CODE' ) ){
 			$mailchimp_list_id = get_option( 'list_id' );
 		} else {
 			$languages = get_option( $this->option_name . '_lang');
