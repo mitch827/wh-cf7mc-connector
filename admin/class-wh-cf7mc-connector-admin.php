@@ -193,7 +193,7 @@ class Wh_Cf7mc_Connector_Admin {
 		    array( 'label_for' => $this->option_name . '_api_key' )
 		);
 
-		if ( defined( 'ICL_LANGUAGE_CODE' ) ){
+		if ( defined( 'ICL_LANGUAGE_CODE' ) && !empty( ICL_LANGUAGE_CODE ) ){
 			add_settings_field(
 			    $this->option_name . '_lang',
 			    __( 'Languages', 'wh-cf7mc-connector' ),
@@ -206,17 +206,17 @@ class Wh_Cf7mc_Connector_Admin {
 			if ( isset( $this->languages ) && !empty( $this->languages ) ){
 				foreach ( $this->languages as $lang ){
 					add_settings_field(
-						$this->option_name . '_list_id[ ' . $lang . ']',
+						$this->option_name . '_list_id_multi[ ' . $lang . ']',
 						__( 'List ID', 'wh-cf7mc-connector'). ' '.  $lang,
 						array( $this, $this->option_name . '_list_id_cb' ),
 						$this->plugin_name . '_mailchimp_account',
 						$this->option_name . '_mailchimp_account',
 						$param = array( 
-							'label_for' => $this->option_name . '_list_id[ ' . $lang . ']',
+							'label_for' => $this->option_name . '_list_id_multi[ ' . $lang . ']',
 							'language' 	=> $lang
 						)
 					);
-					register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_list_id' );
+					register_setting( $this->plugin_name . '_mailchimp_account', $this->option_name . '_list_id_multi' );
 				}
 			}
 		} else {
@@ -376,7 +376,7 @@ class Wh_Cf7mc_Connector_Admin {
 	 * @return void
 	 */
 	public function wh_Cf7mc_Connector_lang_cb() {
-		if ( defined( 'ICL_LANGUAGE_CODE' ) ){
+		if ( defined( 'ICL_LANGUAGE_CODE' ) && !empty(ICL_LANGUAGE_CODE) ){
 			$lang_code = apply_filters( 'wpml_active_languages', NULL ); //get current installed languages
 			?>
 			
@@ -431,14 +431,13 @@ class Wh_Cf7mc_Connector_Admin {
 	 * @return void
 	 */
 	public function wh_Cf7mc_Connector_list_id_cb( $param ) {
-		
 		$lists = $this->wh_get_mailchimp_lists(); 					//get mailchimp lists
-		$list_id = get_option( $this->option_name . '_list_id' );	//get selected list IDs
 		$lang = $param['language'];									//function parameter
 		
 		if ( false !== $lang ){
+			$list_id = get_option( $this->option_name . '_list_id_multi' );	//get selected list IDs
 			?>
-				<select id="<?php echo 'list_id_' . $lang; ?>" name="<?php echo $this->option_name . '_list_id[' . $lang . ']'; ?>">
+				<select id="<?php echo 'list_id_' . $lang; ?>" name="<?php echo $this->option_name . '_list_id_multi[' . $lang . ']'; ?>">
 					<?php
 						if ( $lists ) :
 							foreach ( $lists as $list ) :
@@ -452,6 +451,7 @@ class Wh_Cf7mc_Connector_Admin {
 				
 			<?php
 		} else {
+			$list_id = get_option( $this->option_name . '_list_id' );	//get selected list IDs
 			?>
 				<select id="list_id" name="<?php echo $this->option_name . '_list_id'; ?>">
 					<?php
