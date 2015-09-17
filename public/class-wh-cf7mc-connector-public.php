@@ -171,15 +171,15 @@ class Wh_Cf7mc_Connector_Public {
 		$mailchimp_api_key = get_option( $this->option_name . '_api_key' );
 
 		if ( defined( 'ICL_LANGUAGE_CODE' ) ){
-			$mailchimp_list_id = get_option( 'list_id' );
-		} else {
 			$languages = get_option( $this->option_name . '_lang');
 			foreach( $languages as $lang){
-				$mailchimp_multilang_list_id[]= get_option( $this->option_name . '_list_id_' . $lang);
+				$mailchimp_multilang_list_id[]= get_option( $this->option_name . '_list_id_multi[' . $lang . ']' );
 			}
+		} else {
+			$mailchimp_list_id = get_option( $this->option_name . '_list_id' );
 		}
-		$mailchimp_debug = get_option( 'debug' );
-		$honeypot_opt = get_option( 'honeypot' );
+		$debug_opt = get_option( $this->option_name . '_debug' );
+		$honeypot_opt = get_option( $this->option_name . '_honeypot' );
 		
 	
 		// grab an API Key from http://admin.mailchimp.com/account/api/
@@ -190,51 +190,29 @@ class Wh_Cf7mc_Connector_Public {
 		    $honeypot = $posted_data['honeypot'];
 		}
 	
-		if ( $honeypot_opt == 1){
-			if (strlen($honeypot) == 0){
-			  	$data = data_for_mailchimp( $formtitle, $posted_data, $args);
+		if ( $honeypot_opt == 1 ){
+			if ( strlen( $honeypot ) == 0 ){
+			  	$data = data_for_mailchimp( $formtitle, $posted_data, $args );
 			} else {
-				
 				return false;
 			}
 		} else {
-			$data = data_for_mailchimp( $formtitle, $posted_data, $args);
+			$data = data_for_mailchimp( $formtitle, $posted_data, $args );
 		}
 		
 		// Send the form content to MailChimp List without double opt-in
-		if ( ! $multilang ){
-			$retval = $api->listSubscribe($mailchimp_list_id, $data['send_this_email'], $data['mergeData']);
-		} else {
-			if ( defined( 'ICL_LANGUAGE_CODE' ) ){
-				switch (ICL_LANGUAGE_CODE){
-					case 'en':
-						$retval = $api->listSubscribe($mailchimp_multilang_list_id['en'], $data['send_this_email'], $data['mergeData']);
-						break;
-					case 'fr':
-						$retval = $api->listSubscribe($mailchimp_multilang_list_id['fr'], $data['send_this_email'], $data['mergeData']);
-						break;
-					case 'de':
-						$retval = $api->listSubscribe($mailchimp_multilang_list_id['de'], $data['send_this_email'], $data['mergeData']);
-						break;
-					case 'it':
-						$retval = $api->listSubscribe($mailchimp_multilang_list_id['it'], $data['send_this_email'], $data['mergeData']);
-						break;
-					case 'pt':
-						$retval = $api->listSubscribe($mailchimp_multilang_list_id['pt'], $data['send_this_email'], $data['mergeData']);
-						break;
-					case 'es':
-						$retval = $api->listSubscribe($mailchimp_multilang_list_id['es'], $data['send_this_email'], $data['mergeData']);
-						break;
-					default:
-						$retval = $api->listSubscribe($mailchimp_list_id, $data['send_this_email'], $data['mergeData']);
-						break;
+		if ( defined( 'ICL_LANGUAGE_CODE' ) ){
+			$lang_codes = apply_filters( 'wpml_active_languages', NULL ); //get current installed languages
+			foreach ( $lang_codes as $lang_code ){
+				if ( ICL_LANGUAGE_CODE == $lang_code ){
+					$retval = $api->listSubscribe($mailchimp_multilang_list_id[ $lang_code['language_code'] ], $data['send_this_email'], $data['mergeData']);
 				}
-			} else {
-				wp_die("For multilanguage forms you have to download and install WPML plugin.<br><br>Go back to <a href='" . get_admin_url(null, 'plugins.php') . "'>plugins page</a>.");
 			}
+		} else {
+			$retval = $api->listSubscribe($mailchimp_list_id, $data['send_this_email'], $data['mergeData']);	
 		}
 		
-		if ( $mailchimp_debug == 1 ){
+		if ( $debug_opt == 1 ){
 			//this is for debug purposes
 		    $debug = array(
 		    'time' => date('Y.m.d H:i:s e P'),
