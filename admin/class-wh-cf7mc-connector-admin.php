@@ -128,6 +128,23 @@ class Wh_Cf7mc_Connector_Admin {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wh-cf7mc-connector-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
+	
+	/**
+	 * This function provides simple check for the presence of WPML plugin.
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	public function wpml_check(){
+		if (defined ( 'ICL_LANGUAGE_CODE' ) ){
+			$wpml_check = ICL_LANGUAGE_CODE;
+			if ( !empty( $wpml_check ) ){
+				return TRUE;
+			}
+			return FALSE;
+		}
+		return FALSE;
+	}
 
 	/**
 	 * Add an options page under the Settings submenu
@@ -160,6 +177,7 @@ class Wh_Cf7mc_Connector_Admin {
 	 * @since  1.0.0
 	 */
 	public function register_setting() {
+		$wpml = $this->wpml_check(); //check for the presence of WPML
 		
 		// Add sections
 		add_settings_section(
@@ -192,8 +210,8 @@ class Wh_Cf7mc_Connector_Admin {
 		    $this->option_name . '_mailchimp_account',
 		    array( 'label_for' => $this->option_name . '_api_key' )
 		);
-
-		if ( defined( 'ICL_LANGUAGE_CODE' ) && !empty( ICL_LANGUAGE_CODE ) ){
+		
+		if ( TRUE === $wpml ){
 			add_settings_field(
 			    $this->option_name . '_lang',
 			    __( 'Languages', 'wh-cf7mc-connector' ),
@@ -376,7 +394,8 @@ class Wh_Cf7mc_Connector_Admin {
 	 * @return void
 	 */
 	public function wh_Cf7mc_Connector_lang_cb() {
-		if ( defined( 'ICL_LANGUAGE_CODE' ) && !empty(ICL_LANGUAGE_CODE) ){
+		$wpml = $this->wpml_check();
+		if ( TRUE === $wpml ){
 			$lang_code = apply_filters( 'wpml_active_languages', NULL ); //get current installed languages
 			?>
 			
