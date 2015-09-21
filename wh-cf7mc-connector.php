@@ -16,7 +16,7 @@
  * Plugin Name:       WH CF7 Mailchimp connector
  * Plugin URI:        https://github.com/mitch827/wh-cf7mc-connector
  * Description:       This plugin connect Contact Form 7 with Mailchimp using MCAPI v1.3. Superpowered by <strong>Web Heroes.</strong>
- * Version:           1.1.0a
+ * Version:           1.1.1a
  * Author:            Web Heroes
  * Author URI:        http://www.webheroes.it
  * License:           GPL-2.0+

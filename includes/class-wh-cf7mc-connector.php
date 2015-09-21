@@ -69,7 +69,7 @@ class Wh_Cf7mc_Connector {
 	public function __construct() {
 
 		$this->plugin_name = 'wh-cf7mc-connector';
-		$this->version = '1.1.0a';
+		$this->version = '1.1.1a';
 
 		$this->load_dependencies();
 		$this->set_locale();

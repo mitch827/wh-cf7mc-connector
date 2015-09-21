@@ -65,7 +65,7 @@ class Wh_Cf7mc_Connector_Admin {
 	 * @access   private
 	 * @var      array    $languages    Languages of the contact forms.
 	 */
-	private $languages = [];
+	private $languages = array();
 
 	/**
 	 * Initialize the class and set its properties.
